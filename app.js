@@ -187,29 +187,94 @@ function renderPhrase() {
 }
 
 // === 音声合成（読み上げ） ===
+// 読み込み済み音声リストのキャッシュ
+let cachedVoices = [];
+let speechUnlocked = false;
+
+function loadVoices() {
+  cachedVoices = window.speechSynthesis.getVoices();
+}
+
+// iOS Safari対策：最初のタッチで音声再生のロックを解除
+function unlockSpeech() {
+  if (speechUnlocked) return;
+  if (!('speechSynthesis' in window)) return;
+  const dummy = new SpeechSynthesisUtterance('');
+  dummy.volume = 0;
+  dummy.lang = 'en-US';
+  window.speechSynthesis.speak(dummy);
+  speechUnlocked = true;
+  // 音声リストも事前読み込み
+  loadVoices();
+}
+
 function speakEnglish(text) {
   if (!('speechSynthesis' in window)) {
-    alert('このブラウザは音声読み上げに対応していません。');
+    alert('このブラウザは音声読み上げに対応していません。Chrome等をお使いください。');
     return;
   }
+
+  // 音声ロック解除（初回のみ）
+  unlockSpeech();
+
+  // 音声リストが未読込の場合、読み込みを待ってからリトライ
+  if (cachedVoices.length === 0) {
+    loadVoices();
+    if (cachedVoices.length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        loadVoices();
+        doSpeak(text);
+      };
+      // フォールバック：300ms後に音声指定なしで再生を試みる
+      setTimeout(() => doSpeak(text), 300);
+      return;
+    }
+  }
+
+  doSpeak(text);
+}
+
+function doSpeak(text) {
+  // iOS Safari バグ回避：cancel直後のspeakが無視される問題
   window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'en-US';
-  utter.rate = 0.85;
-  utter.pitch = 1;
 
-  // 英語の音声を優先選択
-  const voices = window.speechSynthesis.getVoices();
-  const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
-    || voices.find(v => v.lang.startsWith('en-US'))
-    || voices.find(v => v.lang.startsWith('en'));
-  if (enVoice) utter.voice = enVoice;
+  // iOS用の短い遅延を入れてからspeakを実行
+  setTimeout(() => {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    utter.rate = 0.85;
+    utter.pitch = 1;
+    utter.volume = 1;
 
-  $('btn-listen').classList.add('playing');
-  utter.onend = () => $('btn-listen').classList.remove('playing');
-  utter.onerror = () => $('btn-listen').classList.remove('playing');
+    // 英語の音声を優先選択
+    if (cachedVoices.length === 0) loadVoices();
+    const enVoice = cachedVoices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
+      || cachedVoices.find(v => v.lang === 'en-US')
+      || cachedVoices.find(v => v.lang.startsWith('en-US'))
+      || cachedVoices.find(v => v.lang.startsWith('en'));
+    if (enVoice) utter.voice = enVoice;
 
-  window.speechSynthesis.speak(utter);
+    $('btn-listen').classList.add('playing');
+    utter.onend = () => $('btn-listen').classList.remove('playing');
+    utter.onerror = (e) => {
+      console.error('音声再生エラー:', e);
+      $('btn-listen').classList.remove('playing');
+    };
+
+    window.speechSynthesis.speak(utter);
+
+    // iOS Safari: 長い文章が途中で止まる問題の対策
+    if (/iP(hone|ad|od)/.test(navigator.userAgent)) {
+      const keepAlive = setInterval(() => {
+        if (!window.speechSynthesis.speaking) {
+          clearInterval(keepAlive);
+        } else {
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        }
+      }, 5000);
+    }
+  }, 100);
 }
 
 // === 音声認識（マイク入力） ===
@@ -416,11 +481,15 @@ function setupEventListeners() {
     renderCustomList();
   });
 
-  // 音声リスト読み込み（Chromeの仕様対応）
+  // 音声リスト読み込み（Chrome/Safari対応）
   if ('speechSynthesis' in window) {
-    speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-    speechSynthesis.getVoices();
+    speechSynthesis.onvoiceschanged = () => loadVoices();
+    loadVoices();
   }
+
+  // iOS Safari対策：最初のタッチイベントで音声ロック解除
+  document.addEventListener('touchstart', unlockSpeech, { once: true });
+  document.addEventListener('click', unlockSpeech, { once: true });
 }
 
 // === アプリ起動 ===
