@@ -235,10 +235,17 @@ function speakEnglish(text) {
 }
 
 function doSpeak(text) {
+  // デバッグ表示
+  const dbg = $('debug-status');
+  if (dbg) {
+    dbg.style.display = 'block';
+    dbg.textContent = '🔍 音声準備中...';
+  }
+
   // iOS Safari バグ回避：cancel直後のspeakが無視される問題
   window.speechSynthesis.cancel();
 
-  // iOS用の短い遅延を入れてからspeakを実行
+  // 短い遅延を入れてからspeakを実行
   setTimeout(() => {
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
@@ -248,17 +255,33 @@ function doSpeak(text) {
 
     // 英語の音声を優先選択
     if (cachedVoices.length === 0) loadVoices();
+
+    // デバッグ: 利用可能な音声リスト
+    const allVoiceInfo = cachedVoices.map(v => `${v.name}(${v.lang})`).join(', ');
+    
     const enVoice = cachedVoices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
       || cachedVoices.find(v => v.lang === 'en-US')
       || cachedVoices.find(v => v.lang.startsWith('en-US'))
       || cachedVoices.find(v => v.lang.startsWith('en'));
     if (enVoice) utter.voice = enVoice;
 
+    // デバッグ情報表示
+    if (dbg) {
+      dbg.textContent = `✅ 音声数:${cachedVoices.length} | 選択:${enVoice ? enVoice.name : 'デフォルト'} | テキスト:${text}`;
+    }
+
     $('btn-listen').classList.add('playing');
-    utter.onend = () => $('btn-listen').classList.remove('playing');
+    utter.onstart = () => {
+      if (dbg) dbg.textContent += ' | ▶️再生中';
+    };
+    utter.onend = () => {
+      $('btn-listen').classList.remove('playing');
+      if (dbg) dbg.textContent += ' | ⏹️完了';
+    };
     utter.onerror = (e) => {
       console.error('音声再生エラー:', e);
       $('btn-listen').classList.remove('playing');
+      if (dbg) dbg.textContent = `❌ エラー: ${e.error || e.message || JSON.stringify(e)}`;
     };
 
     window.speechSynthesis.speak(utter);
