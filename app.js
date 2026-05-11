@@ -234,40 +234,45 @@ function speakEnglish(text) {
   doSpeak(text);
 }
 
-function doSpeak(text) {
+function doSpeak(text, retryCount = 0) {
   // デバッグ表示
   const dbg = $('debug-status');
   if (dbg) {
     dbg.style.display = 'block';
-    dbg.textContent = '🔍 音声準備中...';
+    dbg.textContent = `🔍 音声準備中... (試行${retryCount + 1})`;
   }
 
-  // iOS Safari バグ回避：cancel直後のspeakが無視される問題
   window.speechSynthesis.cancel();
 
-  // 短い遅延を入れてからspeakを実行
   setTimeout(() => {
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'en-US';
     utter.rate = 0.85;
     utter.pitch = 1;
     utter.volume = 1;
 
-    // 英語の音声を優先選択
+    // 音声リスト取得
     if (cachedVoices.length === 0) loadVoices();
 
-    // デバッグ: 利用可能な音声リスト
-    const allVoiceInfo = cachedVoices.map(v => `${v.name}(${v.lang})`).join(', ');
-    
-    const enVoice = cachedVoices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
-      || cachedVoices.find(v => v.lang === 'en-US')
-      || cachedVoices.find(v => v.lang.startsWith('en-US'))
-      || cachedVoices.find(v => v.lang.startsWith('en'));
-    if (enVoice) utter.voice = enVoice;
-
-    // デバッグ情報表示
-    if (dbg) {
-      dbg.textContent = `✅ 音声数:${cachedVoices.length} | 選択:${enVoice ? enVoice.name : 'デフォルト'} | テキスト:${text}`;
+    if (retryCount === 0) {
+      // 第1試行：音声を指定して再生
+      utter.lang = 'en-US';
+      const enVoice = cachedVoices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
+        || cachedVoices.find(v => v.lang === 'en-US')
+        || cachedVoices.find(v => v.lang.startsWith('en-US'))
+        || cachedVoices.find(v => v.lang.startsWith('en'));
+      if (enVoice) utter.voice = enVoice;
+      if (dbg) dbg.textContent = `🔊 試行1 | 音声数:${cachedVoices.length} | 選択:${enVoice ? enVoice.name : 'デフォルト'}`;
+    } else if (retryCount === 1) {
+      // 第2試行：音声を指定せずlangのみ
+      utter.lang = 'en-US';
+      if (dbg) dbg.textContent = `🔊 試行2 | 音声指定なし(en-US)`;
+    } else if (retryCount === 2) {
+      // 第3試行：langを'en'に変更
+      utter.lang = 'en';
+      if (dbg) dbg.textContent = `🔊 試行3 | lang=en`;
+    } else {
+      // 第4試行：lang指定なし（デバイスのデフォルト言語）
+      if (dbg) dbg.textContent = `🔊 試行4 | デフォルト言語`;
     }
 
     $('btn-listen').classList.add('playing');
@@ -281,7 +286,19 @@ function doSpeak(text) {
     utter.onerror = (e) => {
       console.error('音声再生エラー:', e);
       $('btn-listen').classList.remove('playing');
-      if (dbg) dbg.textContent = `❌ エラー: ${e.error || e.message || JSON.stringify(e)}`;
+
+      // リトライ（最大4回まで）
+      if (retryCount < 3) {
+        if (dbg) dbg.textContent = `⚠️ 試行${retryCount + 1}失敗(${e.error}) → 再試行中...`;
+        setTimeout(() => doSpeak(text, retryCount + 1), 200);
+      } else {
+        // 全試行失敗
+        if (dbg) {
+          dbg.innerHTML = `❌ 音声再生に失敗しました<br>
+            📱 対処法: スマホの「設定」→「一般管理」→「テキスト読み上げ」→<br>
+            Google テキスト読み上げの「設定」→「英語」をダウンロードしてください`;
+        }
+      }
     };
 
     window.speechSynthesis.speak(utter);
