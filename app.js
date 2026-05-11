@@ -189,132 +189,90 @@ function renderPhrase() {
 // === 音声合成（読み上げ） ===
 // 読み込み済み音声リストのキャッシュ
 let cachedVoices = [];
-let speechUnlocked = false;
 
 function loadVoices() {
   cachedVoices = window.speechSynthesis.getVoices();
 }
 
-// iOS Safari対策：最初のタッチで音声再生のロックを解除
-function unlockSpeech() {
-  if (speechUnlocked) return;
-  if (!('speechSynthesis' in window)) return;
-  const dummy = new SpeechSynthesisUtterance('');
-  dummy.volume = 0;
-  dummy.lang = 'en-US';
-  window.speechSynthesis.speak(dummy);
-  speechUnlocked = true;
-  // 音声リストも事前読み込み
-  loadVoices();
-}
-
 function speakEnglish(text) {
-  if (!('speechSynthesis' in window)) {
-    alert('このブラウザは音声読み上げに対応していません。Chrome等をお使いください。');
-    return;
-  }
-
-  // 音声ロック解除（初回のみ）
-  unlockSpeech();
-
-  // 音声リストが未読込の場合、読み込みを待ってからリトライ
-  if (cachedVoices.length === 0) {
-    loadVoices();
-    if (cachedVoices.length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        loadVoices();
-        doSpeak(text);
-      };
-      // フォールバック：300ms後に音声指定なしで再生を試みる
-      setTimeout(() => doSpeak(text), 300);
-      return;
-    }
-  }
-
-  doSpeak(text);
-}
-
-function doSpeak(text, retryCount = 0) {
-  // デバッグ表示
   const dbg = $('debug-status');
   if (dbg) {
     dbg.style.display = 'block';
-    dbg.textContent = `🔍 音声準備中... (試行${retryCount + 1})`;
+    dbg.textContent = '🔍 準備中...';
   }
 
-  window.speechSynthesis.cancel();
+  if (!('speechSynthesis' in window)) {
+    if (dbg) dbg.textContent = '❌ このブラウザは音声非対応です';
+    return;
+  }
 
-  setTimeout(() => {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = 0.85;
-    utter.pitch = 1;
-    utter.volume = 1;
+  // 前の再生があれば停止（speaking中のみ）
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+  }
 
-    // 音声リスト取得
-    if (cachedVoices.length === 0) loadVoices();
+  // 音声リスト読み込み
+  if (cachedVoices.length === 0) loadVoices();
 
-    if (retryCount === 0) {
-      // 第1試行：音声を指定して再生
-      utter.lang = 'en-US';
-      const enVoice = cachedVoices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
-        || cachedVoices.find(v => v.lang === 'en-US')
-        || cachedVoices.find(v => v.lang.startsWith('en-US'))
-        || cachedVoices.find(v => v.lang.startsWith('en'));
-      if (enVoice) utter.voice = enVoice;
-      if (dbg) dbg.textContent = `🔊 試行1 | 音声数:${cachedVoices.length} | 選択:${enVoice ? enVoice.name : 'デフォルト'}`;
-    } else if (retryCount === 1) {
-      // 第2試行：音声を指定せずlangのみ
-      utter.lang = 'en-US';
-      if (dbg) dbg.textContent = `🔊 試行2 | 音声指定なし(en-US)`;
-    } else if (retryCount === 2) {
-      // 第3試行：langを'en'に変更
-      utter.lang = 'en';
-      if (dbg) dbg.textContent = `🔊 試行3 | lang=en`;
-    } else {
-      // 第4試行：lang指定なし（デバイスのデフォルト言語）
-      if (dbg) dbg.textContent = `🔊 試行4 | デフォルト言語`;
-    }
+  // 発話オブジェクトを作成
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.85;
+  utter.pitch = 1;
+  utter.volume = 1;
 
-    $('btn-listen').classList.add('playing');
-    utter.onstart = () => {
-      if (dbg) dbg.textContent += ' | ▶️再生中';
-    };
-    utter.onend = () => {
-      $('btn-listen').classList.remove('playing');
-      if (dbg) dbg.textContent += ' | ⏹️完了';
-    };
-    utter.onerror = (e) => {
-      console.error('音声再生エラー:', e);
-      $('btn-listen').classList.remove('playing');
+  // 英語音声を探す（見つからなければ指定しない）
+  const enVoice = cachedVoices.find(v => v.lang === 'en-US')
+    || cachedVoices.find(v => v.lang.startsWith('en'));
+  if (enVoice) utter.voice = enVoice;
 
-      // リトライ（最大4回まで）
-      if (retryCount < 3) {
-        if (dbg) dbg.textContent = `⚠️ 試行${retryCount + 1}失敗(${e.error}) → 再試行中...`;
-        setTimeout(() => doSpeak(text, retryCount + 1), 200);
-      } else {
-        // 全試行失敗
+  if (dbg) {
+    dbg.textContent = `🔊 音声数:${cachedVoices.length} | 選択:${enVoice ? enVoice.name : 'デフォルト'} | ${text}`;
+  }
+
+  // イベントハンドラ
+  $('btn-listen').classList.add('playing');
+  utter.onstart = () => {
+    if (dbg) dbg.textContent += ' | ▶️再生中';
+  };
+  utter.onend = () => {
+    $('btn-listen').classList.remove('playing');
+    if (dbg) dbg.textContent += ' | ⏹️完了';
+  };
+  utter.onerror = (e) => {
+    $('btn-listen').classList.remove('playing');
+    if (dbg) dbg.textContent = `❌ エラー: ${e.error}`;
+
+    // synthesis-failedの場合、音声指定なしでリトライ
+    if (e.error === 'synthesis-failed' && enVoice) {
+      if (dbg) dbg.textContent += ' → 音声なしでリトライ中...';
+      const retry = new SpeechSynthesisUtterance(text);
+      retry.lang = 'en';
+      retry.rate = 0.85;
+      retry.volume = 1;
+      // 音声を指定しない
+      retry.onstart = () => {
+        if (dbg) dbg.textContent = '🔊 リトライ成功 | ▶️再生中';
+        $('btn-listen').classList.add('playing');
+      };
+      retry.onend = () => {
+        $('btn-listen').classList.remove('playing');
+        if (dbg) dbg.textContent += ' | ⏹️完了';
+      };
+      retry.onerror = (e2) => {
+        $('btn-listen').classList.remove('playing');
         if (dbg) {
-          dbg.innerHTML = `❌ 音声再生に失敗しました<br>
-            📱 対処法: スマホの「設定」→「一般管理」→「テキスト読み上げ」→<br>
-            Google テキスト読み上げの「設定」→「英語」をダウンロードしてください`;
+          dbg.innerHTML = `❌ 音声再生できません (${e2.error})<br>
+            📱 Chromeの代わりに「Samsung Internet」や「Firefox」で試してください<br>
+            または設定 → Google テキスト読み上げ → 英語データを再ダウンロード`;
         }
-      }
-    };
-
-    window.speechSynthesis.speak(utter);
-
-    // iOS Safari: 長い文章が途中で止まる問題の対策
-    if (/iP(hone|ad|od)/.test(navigator.userAgent)) {
-      const keepAlive = setInterval(() => {
-        if (!window.speechSynthesis.speaking) {
-          clearInterval(keepAlive);
-        } else {
-          window.speechSynthesis.pause();
-          window.speechSynthesis.resume();
-        }
-      }, 5000);
+      };
+      window.speechSynthesis.speak(retry);
     }
-  }, 100);
+  };
+
+  // ★ 直接再生（setTimeoutなし = ユーザージェスチャーを維持）
+  window.speechSynthesis.speak(utter);
 }
 
 // === 音声認識（マイク入力） ===
@@ -526,10 +484,6 @@ function setupEventListeners() {
     speechSynthesis.onvoiceschanged = () => loadVoices();
     loadVoices();
   }
-
-  // iOS Safari対策：最初のタッチイベントで音声ロック解除
-  document.addEventListener('touchstart', unlockSpeech, { once: true });
-  document.addEventListener('click', unlockSpeech, { once: true });
 }
 
 // === アプリ起動 ===
