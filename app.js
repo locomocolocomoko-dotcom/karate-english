@@ -187,12 +187,8 @@ function renderPhrase() {
 }
 
 // === 音声合成（読み上げ） ===
-// 読み込み済み音声リストのキャッシュ
-let cachedVoices = [];
-
-function loadVoices() {
-  cachedVoices = window.speechSynthesis.getVoices();
-}
+// 現在再生中のAudio要素
+let currentAudio = null;
 
 function speakEnglish(text) {
   const dbg = $('debug-status');
@@ -201,77 +197,83 @@ function speakEnglish(text) {
     dbg.textContent = '🔍 準備中...';
   }
 
-  if (!('speechSynthesis' in window)) {
-    if (dbg) dbg.textContent = '❌ このブラウザは音声非対応です';
-    return;
+  // 前の再生を停止
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
   }
-
-  // 前の再生があれば停止（speaking中のみ）
-  if (window.speechSynthesis.speaking) {
+  if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
     window.speechSynthesis.cancel();
   }
 
-  // 音声リスト読み込み
-  if (cachedVoices.length === 0) loadVoices();
+  // 方式1: Google Translate TTS（Audio要素でMP3再生 → 最も互換性が高い）
+  speakWithAudio(text, dbg);
+}
 
-  // 発話オブジェクトを作成
+// Google Translate TTSを使った音声再生
+function speakWithAudio(text, dbg) {
+  const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(text)}`;
+  
+  const audio = new Audio(url);
+  currentAudio = audio;
+  audio.playbackRate = 0.9;
+
+  if (dbg) dbg.textContent = `🔊 Audio方式 | ${text}`;
+
+  $('btn-listen').classList.add('playing');
+
+  audio.onplay = () => {
+    if (dbg) dbg.textContent += ' | ▶️再生中';
+  };
+
+  audio.onended = () => {
+    $('btn-listen').classList.remove('playing');
+    currentAudio = null;
+    if (dbg) dbg.textContent += ' | ⏹️完了';
+  };
+
+  audio.onerror = () => {
+    $('btn-listen').classList.remove('playing');
+    currentAudio = null;
+    if (dbg) dbg.textContent = '⚠️ Audio方式失敗 → Web Speech APIで再試行...';
+    // フォールバック: Web Speech API
+    speakWithSpeechAPI(text, dbg);
+  };
+
+  audio.play().catch(() => {
+    // play()のPromiseが拒否された場合もフォールバック
+    $('btn-listen').classList.remove('playing');
+    currentAudio = null;
+    if (dbg) dbg.textContent = '⚠️ Audio再生拒否 → Web Speech APIで再試行...';
+    speakWithSpeechAPI(text, dbg);
+  });
+}
+
+// フォールバック: Web Speech API
+function speakWithSpeechAPI(text, dbg) {
+  if (!('speechSynthesis' in window)) {
+    if (dbg) dbg.textContent = '❌ 音声再生に対応していません';
+    return;
+  }
+
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'en-US';
   utter.rate = 0.85;
-  utter.pitch = 1;
   utter.volume = 1;
 
-  // 英語音声を探す（見つからなければ指定しない）
-  const enVoice = cachedVoices.find(v => v.lang === 'en-US')
-    || cachedVoices.find(v => v.lang.startsWith('en'));
-  if (enVoice) utter.voice = enVoice;
-
-  if (dbg) {
-    dbg.textContent = `🔊 音声数:${cachedVoices.length} | 選択:${enVoice ? enVoice.name : 'デフォルト'} | ${text}`;
-  }
-
-  // イベントハンドラ
   $('btn-listen').classList.add('playing');
   utter.onstart = () => {
-    if (dbg) dbg.textContent += ' | ▶️再生中';
+    if (dbg) dbg.textContent = '🔊 SpeechAPI方式 | ▶️再生中';
   };
   utter.onend = () => {
     $('btn-listen').classList.remove('playing');
     if (dbg) dbg.textContent += ' | ⏹️完了';
   };
-  utter.onerror = (e) => {
+  utter.onerror = () => {
     $('btn-listen').classList.remove('playing');
-    if (dbg) dbg.textContent = `❌ エラー: ${e.error}`;
-
-    // synthesis-failedの場合、音声指定なしでリトライ
-    if (e.error === 'synthesis-failed' && enVoice) {
-      if (dbg) dbg.textContent += ' → 音声なしでリトライ中...';
-      const retry = new SpeechSynthesisUtterance(text);
-      retry.lang = 'en';
-      retry.rate = 0.85;
-      retry.volume = 1;
-      // 音声を指定しない
-      retry.onstart = () => {
-        if (dbg) dbg.textContent = '🔊 リトライ成功 | ▶️再生中';
-        $('btn-listen').classList.add('playing');
-      };
-      retry.onend = () => {
-        $('btn-listen').classList.remove('playing');
-        if (dbg) dbg.textContent += ' | ⏹️完了';
-      };
-      retry.onerror = (e2) => {
-        $('btn-listen').classList.remove('playing');
-        if (dbg) {
-          dbg.innerHTML = `❌ 音声再生できません (${e2.error})<br>
-            📱 Chromeの代わりに「Samsung Internet」や「Firefox」で試してください<br>
-            または設定 → Google テキスト読み上げ → 英語データを再ダウンロード`;
-        }
-      };
-      window.speechSynthesis.speak(retry);
-    }
+    if (dbg) dbg.textContent = '❌ 全方式で再生失敗。別のブラウザで試してください';
   };
 
-  // ★ 直接再生（setTimeoutなし = ユーザージェスチャーを維持）
   window.speechSynthesis.speak(utter);
 }
 
