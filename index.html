@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>空手道場 英会話トレーナー</title>
+  <meta name="description" content="空手道場で海外生徒と会話するための英会話練習ツール">
+  <meta name="theme-color" content="#0a0a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- ファビコン（SVGインライン） -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥋</text></svg>">
+</head>
+<body>
+  <div id="app">
+    <!-- ==================== ホーム画面 ==================== -->
+    <div id="home-screen" class="screen active">
+      <header class="home-header">
+        <div class="logo-area">
+          <span class="logo-icon">🥋</span>
+          <h1>道場英会話</h1>
+        </div>
+        <p class="subtitle">海外からの生徒と話すための英会話トレーナー</p>
+      </header>
+
+      <div class="category-grid" id="category-grid">
+        <!-- JavaScriptで描画 -->
+      </div>
+
+      <footer class="home-footer">
+        <button class="btn-custom-manage" id="btn-manage-custom" aria-label="カスタムフレーズ管理">
+          <span class="btn-icon">⚙️</span>
+          <span>カスタムフレーズ管理</span>
+        </button>
+      </footer>
+    </div>
+
+    <!-- ==================== 練習画面 ==================== -->
+    <div id="practice-screen" class="screen">
+      <header class="practice-header">
+        <button class="btn-back" id="btn-back" aria-label="戻る">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="practice-title">
+          <span id="practice-category-icon"></span>
+          <span id="practice-category-name"></span>
+        </div>
+        <div class="practice-progress">
+          <span id="practice-current">1</span>/<span id="practice-total">10</span>
+        </div>
+      </header>
+
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+
+      <!-- フレーズカード -->
+      <div class="card-container">
+        <div class="phrase-card" id="phrase-card">
+          <div class="phrase-ja" id="phrase-ja"></div>
+          <div class="phrase-en" id="phrase-en"></div>
+          <button class="btn-show-hint" id="btn-show-hint">
+            <span>💡 発音ヒント</span>
+          </button>
+          <div class="phrase-hint hidden" id="phrase-hint"></div>
+        </div>
+      </div>
+
+      <!-- アクションボタン -->
+      <div class="action-area">
+        <button class="btn-action btn-listen" id="btn-listen" aria-label="発音を聞く">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          <span>聞く</span>
+        </button>
+        <button class="btn-action btn-speak" id="btn-speak" aria-label="発音してみる">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+          <span>話す</span>
+        </button>
+      </div>
+
+      <!-- 音声認識の結果 -->
+      <div class="result-area hidden" id="result-area">
+        <div class="result-label" id="result-label">あなたの発音：</div>
+        <div class="result-text" id="result-text"></div>
+        <div class="result-status" id="result-status"></div>
+      </div>
+
+      <!-- ナビゲーション -->
+      <div class="nav-area">
+        <button class="btn-nav" id="btn-prev" aria-label="前へ">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <span>前へ</span>
+        </button>
+        <button class="btn-nav btn-nav-primary" id="btn-next" aria-label="次へ">
+          <span>次へ</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== カスタムフレーズ管理画面 ==================== -->
+    <div id="custom-screen" class="screen">
+      <header class="practice-header">
+        <button class="btn-back" id="btn-back-custom" aria-label="戻る">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="practice-title">
+          <span>➕</span>
+          <span>カスタムフレーズ管理</span>
+        </div>
+        <div></div>
+      </header>
+
+      <div class="custom-content">
+        <form class="custom-form" id="custom-form">
+          <div class="form-group">
+            <label for="input-ja">日本語</label>
+            <input type="text" id="input-ja" placeholder="例：トイレはどこですか？" required>
+          </div>
+          <div class="form-group">
+            <label for="input-en">英語</label>
+            <input type="text" id="input-en" placeholder="例：Where is the restroom?" required>
+          </div>
+          <div class="form-group">
+            <label for="input-hint">発音ヒント（カタカナ・任意）</label>
+            <input type="text" id="input-hint" placeholder="例：ウェア イズ ザ レストルーム？">
+          </div>
+          <button type="submit" class="btn-add-phrase">＋ フレーズを追加</button>
+        </form>
+
+        <div class="custom-list" id="custom-list">
+          <!-- JavaScriptで描画 -->
+        </div>
+
+        <div class="custom-empty hidden" id="custom-empty">
+          <p>まだカスタムフレーズがありません。</p>
+          <p>上のフォームから追加してみましょう！</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 音声認識中のオーバーレイ ==================== -->
+    <div class="listening-overlay hidden" id="listening-overlay">
+      <div class="listening-content">
+        <div class="listening-pulse"></div>
+        <div class="listening-icon">🎤</div>
+        <p class="listening-text">聞いています...</p>
+        <button class="btn-stop-listening" id="btn-stop-listening">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
