@@ -6,72 +6,72 @@ const CATEGORIES = [
     id: 'greeting', name: '出迎え・挨拶', icon: '🤝',
     description: '最初の挨拶と自己紹介',
     phrases: [
-      { ja: 'ようこそ！', en: 'Welcome!', hint: 'ウェルカム！' },
-      { ja: 'はじめまして。', en: 'Nice to meet you.', hint: 'ナイス トゥ ミート ユー' },
-      { ja: '私が先生です。', en: "I'm the instructor.", hint: 'アイム ジ インストラクター' },
-      { ja: '来てくれてありがとう。', en: 'Thank you for coming.', hint: 'サンキュー フォー カミング' },
-      { ja: 'お名前は？', en: "What's your name?", hint: 'ワッツ ユア ネーム？' },
-      { ja: 'どこから来たの？', en: 'Where are you from?', hint: 'ウェア アー ユー フロム？' },
-      { ja: '日本は初めてですか？', en: 'Is this your first time in Japan?', hint: 'イズ ディス ユア ファースト タイム イン ジャパン？' },
-      { ja: 'いつ日本に来たの？', en: 'When did you arrive in Japan?', hint: 'ウェン ディド ユー アライヴ イン ジャパン？' },
-      { ja: 'どのくらい滞在しますか？', en: 'How long are you staying?', hint: 'ハウ ロング アー ユー ステイイング？' },
+      { ja: 'ようこそ！', en: 'Welcome!', hint: 'ウェルカム！', audio: 0 },
+      { ja: 'はじめまして。', en: 'Nice to meet you.', hint: 'ナイス トゥ ミート ユー', audio: 1 },
+      { ja: '私が先生です。', en: "I'm the instructor.", hint: 'アイム ジ インストラクター', audio: 2 },
+      { ja: '来てくれてありがとう。', en: 'Thank you for coming.', hint: 'サンキュー フォー カミング', audio: 3 },
+      { ja: 'お名前は？', en: "What's your name?", hint: 'ワッツ ユア ネーム？', audio: 4 },
+      { ja: 'どこから来たの？', en: 'Where are you from?', hint: 'ウェア アー ユー フロム？', audio: 5 },
+      { ja: '日本は初めてですか？', en: 'Is this your first time in Japan?', hint: 'イズ ディス ユア ファースト タイム イン ジャパン？', audio: 6 },
+      { ja: 'いつ日本に来たの？', en: 'When did you arrive in Japan?', hint: 'ウェン ディド ユー アライヴ イン ジャパン？', audio: 7 },
+      { ja: 'どのくらい滞在しますか？', en: 'How long are you staying?', hint: 'ハウ ロング アー ユー ステイイング？', audio: 8 },
     ]
   },
   {
     id: 'smalltalk', name: '雑談', icon: '💬',
     description: '軽い会話・質問',
     phrases: [
-      { ja: 'お仕事は何をされていますか？', en: 'What do you do for a living?', hint: 'ワット ドゥ ユー ドゥ フォー ア リヴィング？' },
-      { ja: '空手はどのくらいやってますか？', en: 'How long have you been practicing karate?', hint: 'ハウ ロング ハヴ ユー ビーン プラクティシング カラテ？' },
-      { ja: '何帯ですか？', en: 'What belt are you?', hint: 'ワット ベルト アー ユー？' },
-      { ja: '何流ですか？', en: 'What style do you practice?', hint: 'ワット スタイル ドゥ ユー プラクティス？' },
-      { ja: '先生は誰ですか？', en: 'Who is your sensei?', hint: 'フー イズ ユア センセイ？' },
-      { ja: '日本はどうですか？', en: 'How do you like Japan?', hint: 'ハウ ドゥ ユー ライク ジャパン？' },
-      { ja: '日本食は好きですか？', en: 'Do you like Japanese food?', hint: 'ドゥ ユー ライク ジャパニーズ フード？' },
-      { ja: '怪我はありますか？', en: 'Do you have any injuries?', hint: 'ドゥ ユー ハヴ エニー インジュリーズ？' },
-      { ja: '何か質問はありますか？', en: 'Do you have any questions?', hint: 'ドゥ ユー ハヴ エニー クエスチョンズ？' },
-      { ja: '疲れてない？大丈夫？', en: 'Are you tired? Are you okay?', hint: 'アー ユー タイアード？ アー ユー オーケー？' },
+      { ja: 'お仕事は何をされていますか？', en: 'What do you do for a living?', hint: 'ワット ドゥ ユー ドゥ フォー ア リヴィング？', audio: 9 },
+      { ja: '空手はどのくらいやってますか？', en: 'How long have you been practicing karate?', hint: 'ハウ ロング ハヴ ユー ビーン プラクティシング カラテ？', audio: 10 },
+      { ja: '何帯ですか？', en: 'What belt are you?', hint: 'ワット ベルト アー ユー？', audio: 11 },
+      { ja: '何流ですか？', en: 'What style do you practice?', hint: 'ワット スタイル ドゥ ユー プラクティス？', audio: 12 },
+      { ja: '先生は誰ですか？', en: 'Who is your sensei?', hint: 'フー イズ ユア センセイ？', audio: 13 },
+      { ja: '日本はどうですか？', en: 'How do you like Japan?', hint: 'ハウ ドゥ ユー ライク ジャパン？', audio: 14 },
+      { ja: '日本食は好きですか？', en: 'Do you like Japanese food?', hint: 'ドゥ ユー ライク ジャパニーズ フード？', audio: 15 },
+      { ja: '怪我はありますか？', en: 'Do you have any injuries?', hint: 'ドゥ ユー ハヴ エニー インジュリーズ？', audio: 16 },
+      { ja: '何か質問はありますか？', en: 'Do you have any questions?', hint: 'ドゥ ユー ハヴ エニー クエスチョンズ？', audio: 17 },
+      { ja: '疲れてない？大丈夫？', en: 'Are you tired? Are you okay?', hint: 'アー ユー タイアード？ アー ユー オーケー？', audio: 18 },
     ]
   },
   {
     id: 'training', name: '稽古', icon: '🥋',
     description: '稽古中に使うフレーズ',
     phrases: [
-      { ja: '並んでください。', en: 'Line up, please.', hint: 'ライン アップ、プリーズ' },
-      { ja: '礼。', en: 'Bow.', hint: 'バウ' },
-      { ja: 'はじめます。', en: "Let's begin.", hint: 'レッツ ビギン' },
-      { ja: '用意。', en: 'Get ready.', hint: 'ゲット レディ' },
-      { ja: 'はじめ！', en: 'Start!', hint: 'スタート！' },
-      { ja: 'やめ！', en: 'Stop!', hint: 'ストップ！' },
-      { ja: 'もう一回。', en: 'One more time.', hint: 'ワン モア タイム' },
-      { ja: 'よく見てください。', en: 'Watch carefully.', hint: 'ウォッチ ケアフリー' },
-      { ja: 'こうやって。', en: 'Like this.', hint: 'ライク ディス' },
-      { ja: '真似してください。', en: 'Follow me.', hint: 'フォロー ミー' },
-      { ja: 'もっと速く！', en: 'Faster!', hint: 'ファスター！' },
-      { ja: 'もっと強く！', en: 'Stronger!', hint: 'ストロンガー！' },
-      { ja: 'もっとゆっくり。', en: 'Slower.', hint: 'スローワー' },
-      { ja: 'いいですよ！', en: 'Good job!', hint: 'グッド ジョブ！' },
-      { ja: 'その調子！', en: 'Keep it up!', hint: 'キープ イット アップ！' },
-      { ja: '二人一組になって。', en: 'Pair up.', hint: 'ペア アップ' },
-      { ja: '相手を変えて。', en: 'Switch partners.', hint: 'スウィッチ パートナーズ' },
-      { ja: '休憩してください。', en: 'Take a break.', hint: 'テイク ア ブレイク' },
-      { ja: '水を飲んでください。', en: 'Drink some water.', hint: 'ドリンク サム ウォーター' },
-      { ja: '今日はここまでです。', en: "That's all for today.", hint: 'ザッツ オール フォー トゥデイ' },
-      { ja: 'お疲れ様でした。', en: 'Thank you for your hard work.', hint: 'サンキュー フォー ユア ハード ワーク' },
+      { ja: '並んでください。', en: 'Line up, please.', hint: 'ライン アップ、プリーズ', audio: 19 },
+      { ja: '礼。', en: 'Bow.', hint: 'バウ', audio: 20 },
+      { ja: 'はじめます。', en: "Let's begin.", hint: 'レッツ ビギン', audio: 21 },
+      { ja: '用意。', en: 'Get ready.', hint: 'ゲット レディ', audio: 22 },
+      { ja: 'はじめ！', en: 'Start!', hint: 'スタート！', audio: 23 },
+      { ja: 'やめ！', en: 'Stop!', hint: 'ストップ！', audio: 24 },
+      { ja: 'もう一回。', en: 'One more time.', hint: 'ワン モア タイム', audio: 25 },
+      { ja: 'よく見てください。', en: 'Watch carefully.', hint: 'ウォッチ ケアフリー', audio: 26 },
+      { ja: 'こうやって。', en: 'Like this.', hint: 'ライク ディス', audio: 27 },
+      { ja: '真似してください。', en: 'Follow me.', hint: 'フォロー ミー', audio: 28 },
+      { ja: 'もっと速く！', en: 'Faster!', hint: 'ファスター！', audio: 29 },
+      { ja: 'もっと強く！', en: 'Stronger!', hint: 'ストロンガー！', audio: 30 },
+      { ja: 'もっとゆっくり。', en: 'Slower.', hint: 'スローワー', audio: 31 },
+      { ja: 'いいですよ！', en: 'Good job!', hint: 'グッド ジョブ！', audio: 32 },
+      { ja: 'その調子！', en: 'Keep it up!', hint: 'キープ イット アップ！', audio: 33 },
+      { ja: '二人一組になって。', en: 'Pair up.', hint: 'ペア アップ', audio: 34 },
+      { ja: '相手を変えて。', en: 'Switch partners.', hint: 'スウィッチ パートナーズ', audio: 35 },
+      { ja: '休憩してください。', en: 'Take a break.', hint: 'テイク ア ブレイク', audio: 36 },
+      { ja: '水を飲んでください。', en: 'Drink some water.', hint: 'ドリンク サム ウォーター', audio: 37 },
+      { ja: '今日はここまでです。', en: "That's all for today.", hint: 'ザッツ オール フォー トゥデイ', audio: 38 },
+      { ja: 'お疲れ様でした。', en: 'Thank you for your hard work.', hint: 'サンキュー フォー ユア ハード ワーク', audio: 39 },
     ]
   },
   {
     id: 'farewell', name: '見送り', icon: '👋',
     description: '帰りの挨拶',
     phrases: [
-      { ja: '今日はありがとうございました。', en: 'Thank you for today.', hint: 'サンキュー フォー トゥデイ' },
-      { ja: '一緒に稽古できてよかったです。', en: 'It was great training with you.', hint: 'イット ワズ グレイト トレーニング ウィズ ユー' },
-      { ja: 'またいつでも来てください。', en: 'Please come again anytime.', hint: 'プリーズ カム アゲイン エニータイム' },
-      { ja: '気をつけて帰ってね。', en: 'Have a safe trip back.', hint: 'ハヴ ア セイフ トリップ バック' },
-      { ja: '楽しかったですか？', en: 'Did you enjoy it?', hint: 'ディド ユー エンジョイ イット？' },
-      { ja: '連絡先を交換しましょう。', en: "Let's exchange contact info.", hint: 'レッツ エクスチェンジ コンタクト インフォ' },
-      { ja: '写真を撮りましょう！', en: "Let's take a photo!", hint: 'レッツ テイク ア フォト！' },
-      { ja: 'また会えるのを楽しみにしています。', en: 'I look forward to seeing you again.', hint: 'アイ ルック フォワード トゥ シーイング ユー アゲイン' },
+      { ja: '今日はありがとうございました。', en: 'Thank you for today.', hint: 'サンキュー フォー トゥデイ', audio: 40 },
+      { ja: '一緒に稽古できてよかったです。', en: 'It was great training with you.', hint: 'イット ワズ グレイト トレーニング ウィズ ユー', audio: 41 },
+      { ja: 'またいつでも来てください。', en: 'Please come again anytime.', hint: 'プリーズ カム アゲイン エニータイム', audio: 42 },
+      { ja: '気をつけて帰ってね。', en: 'Have a safe trip back.', hint: 'ハヴ ア セイフ トリップ バック', audio: 43 },
+      { ja: '楽しかったですか？', en: 'Did you enjoy it?', hint: 'ディド ユー エンジョイ イット？', audio: 44 },
+      { ja: '連絡先を交換しましょう。', en: "Let's exchange contact info.", hint: 'レッツ エクスチェンジ コンタクト インフォ', audio: 45 },
+      { ja: '写真を撮りましょう！', en: "Let's take a photo!", hint: 'レッツ テイク ア フォト！', audio: 46 },
+      { ja: 'また会えるのを楽しみにしています。', en: 'I look forward to seeing you again.', hint: 'アイ ルック フォワード トゥ シーイング ユー アゲイン', audio: 47 },
     ]
   }
 ];
@@ -186,8 +186,7 @@ function renderPhrase() {
   card.style.animation = 'slideUp 0.4s ease';
 }
 
-// === 音声合成（読み上げ） ===
-// 現在再生中のAudio要素
+// === 音声再生（ローカルWAVファイル） ===
 let currentAudio = null;
 
 function speakEnglish(text) {
@@ -200,25 +199,25 @@ function speakEnglish(text) {
   // 前の再生を停止
   if (currentAudio) {
     currentAudio.pause();
+    currentAudio.currentTime = 0;
     currentAudio = null;
   }
-  if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
-    window.speechSynthesis.cancel();
+
+  // 現在のフレーズの音声インデックスを取得
+  const phrase = state.currentCategory.phrases[state.currentIndex];
+  const audioIndex = phrase.audio;
+
+  if (audioIndex === undefined) {
+    if (dbg) dbg.textContent = '⚠️ この音声ファイルは未対応です';
+    return;
   }
 
-  // 方式1: Google Translate TTS（Audio要素でMP3再生 → 最も互換性が高い）
-  speakWithAudio(text, dbg);
-}
-
-// Google Translate TTSを使った音声再生
-function speakWithAudio(text, dbg) {
-  const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(text)}`;
-  
-  const audio = new Audio(url);
+  // WAVファイルのパス
+  const filename = `audio/phrase_${String(audioIndex).padStart(3, '0')}.wav`;
+  const audio = new Audio(filename);
   currentAudio = audio;
-  audio.playbackRate = 0.9;
 
-  if (dbg) dbg.textContent = `🔊 Audio方式 | ${text}`;
+  if (dbg) dbg.textContent = `🔊 ${filename} | ${text}`;
 
   $('btn-listen').classList.add('playing');
 
@@ -232,49 +231,17 @@ function speakWithAudio(text, dbg) {
     if (dbg) dbg.textContent += ' | ⏹️完了';
   };
 
-  audio.onerror = () => {
+  audio.onerror = (e) => {
     $('btn-listen').classList.remove('playing');
     currentAudio = null;
-    if (dbg) dbg.textContent = '⚠️ Audio方式失敗 → Web Speech APIで再試行...';
-    // フォールバック: Web Speech API
-    speakWithSpeechAPI(text, dbg);
+    if (dbg) dbg.textContent = `❌ 音声ファイル読込エラー: ${filename}`;
   };
 
-  audio.play().catch(() => {
-    // play()のPromiseが拒否された場合もフォールバック
+  audio.play().catch((e) => {
     $('btn-listen').classList.remove('playing');
     currentAudio = null;
-    if (dbg) dbg.textContent = '⚠️ Audio再生拒否 → Web Speech APIで再試行...';
-    speakWithSpeechAPI(text, dbg);
+    if (dbg) dbg.textContent = `❌ 再生エラー: ${e.message}`;
   });
-}
-
-// フォールバック: Web Speech API
-function speakWithSpeechAPI(text, dbg) {
-  if (!('speechSynthesis' in window)) {
-    if (dbg) dbg.textContent = '❌ 音声再生に対応していません';
-    return;
-  }
-
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'en-US';
-  utter.rate = 0.85;
-  utter.volume = 1;
-
-  $('btn-listen').classList.add('playing');
-  utter.onstart = () => {
-    if (dbg) dbg.textContent = '🔊 SpeechAPI方式 | ▶️再生中';
-  };
-  utter.onend = () => {
-    $('btn-listen').classList.remove('playing');
-    if (dbg) dbg.textContent += ' | ⏹️完了';
-  };
-  utter.onerror = () => {
-    $('btn-listen').classList.remove('playing');
-    if (dbg) dbg.textContent = '❌ 全方式で再生失敗。別のブラウザで試してください';
-  };
-
-  window.speechSynthesis.speak(utter);
 }
 
 // === 音声認識（マイク入力） ===
